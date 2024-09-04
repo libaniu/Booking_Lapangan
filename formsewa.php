@@ -9,7 +9,6 @@ if (!isset($_SESSION["username"])) {
     exit;
 }
 
-
 // Mendapatkan data name dan username dari tabel users (menggunakan contoh koneksi database)
 $servername = "localhost";
 $username = "root";
@@ -23,6 +22,7 @@ $conn = new mysqli($servername, $username, $password, $dbname);
 if ($conn->connect_error) {
     die("Koneksi database gagal: " . $conn->connect_error);
 }
+
 $sql = "SELECT * FROM lapangan";
 $lapangan = mysqli_query($conn, $sql);
 
@@ -48,9 +48,30 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         die;
     }
 
+    // Mendapatkan harga sewa lapangan
+    $sqlHarga = "SELECT harga_sewa FROM lapangan WHERE id_lapangan = '$id_lapangan'";
+    $resultHarga = $conn->query($sqlHarga);
+
+    if ($resultHarga->num_rows > 0) {
+        $hargaRow = $resultHarga->fetch_assoc();
+        $harga = (float) $hargaRow['harga_sewa'];
+    } else {
+        $harga = 0;
+    }
+
+    // Menghitung durasi sewa dalam jam
+    $lamaSewa = round((strtotime($jam_selesai) - strtotime($jam_mulai)) / 3600, 2);
+
+    // Menghitung total bayar
+    $total_bayar = $harga * $lamaSewa;
+
+    // order id random
+     $order_id = rand();
+
+    $transaction_status = 1;
     // Menyiapkan pernyataan INSERT SQL dengan kolom nama_lapangan
-    $sql = "INSERT INTO formsewa (nama, id_lapangan, tanggal, jam_mulai, jam_selesai) 
-    VALUES ('$nama', '$id_lapangan', '$tanggal', '$jam_mulai', '$jam_selesai')";
+    $sql = "INSERT INTO formsewa (order_id, nama, id_lapangan, tanggal, jam_mulai, jam_selesai, total_bayar) 
+    VALUES ('$order_id', '$nama', '$id_lapangan', '$tanggal', '$jam_mulai', '$jam_selesai', '$total_bayar')";
 
     if ($conn->query($sql) === TRUE) {
         header("Location: formsewa.php?sukses=1");
@@ -146,6 +167,9 @@ $conn->close();
                                 <li class="submenu-item ">
                                     <a href="statussewa.php">Status Pemesanan</a>
                                 </li>
+                                <li class="submenu-item ">
+                                    <a href="payement.php">Pembayaran</a>
+                                </li>
                             </ul>
                         </li>
 
@@ -210,7 +234,7 @@ $conn->close();
                                         </div>
                                         <div class="col-12">
                                             <div class="form-group">
-                                                <label for="jam_selesai">Jam Selesai</label>
+                                                <label for="jam_selesai">Jam Se lesai</label>
                                                 <input type="time" id="jam_selesai" class="form-control" name="jam_selesai" required>
                                             </div>
                                         </div>
@@ -247,7 +271,7 @@ $conn->close();
                 Swal.fire({
                     icon: 'error',
                     title: 'Gagal',
-                    text: 'Jam sewa yang dipilih sudah penuh'
+                    text: 'Jam sewa yang dipilih sudah di booking'
                 })
             <?php endif ?>
         })

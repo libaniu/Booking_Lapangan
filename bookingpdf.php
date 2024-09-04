@@ -23,7 +23,7 @@ function createBookingPDF($bookingId)
     }
 
     // Query untuk mengambil data bukti booking dari tabel 'formsewa' berdasarkan id
-    $sql = "SELECT fs.id, fs.nama, fs.tanggal, fs.jam_mulai, fs.jam_selesai, lapangan.nama_lapangan, lapangan.harga_sewa
+    $sql = "SELECT fs.id, fs.order_id, fs.nama, fs.tanggal, fs.jam_mulai, fs.jam_selesai, lapangan.nama_lapangan, lapangan.harga_sewa
             FROM formsewa fs
             JOIN lapangan ON fs.id_lapangan = lapangan.id_lapangan
             WHERE fs.id = '$bookingId'";
@@ -77,17 +77,13 @@ function createBookingPDF($bookingId)
         $cellWidth = $pdf->GetPageWidth() - 20;
 
         // Fungsi untuk mencetak baris dengan teks sejajar
-        function printAlignedText($pdf, $text, $alignment = 'J', $width)
-        {
-            $pdf->MultiCell($width, 10, $text, 0, $alignment);
-        }
-
         function printAlignedTextWithColon($pdf, $leftText, $rightText, $width)
         {
             $pdf->Cell($width, 10, $leftText . ' : ' . $rightText, 0, 1, 'L');
         }
 
         // Informasi Booking
+        printAlignedTextWithColon($pdf, 'Order ID', $bookingData['order_id'], $cellWidth);
         printAlignedTextWithColon($pdf, 'Nama', $bookingData['nama'], $cellWidth);
         printAlignedTextWithColon($pdf, 'Nama Lapangan', $bookingData['nama_lapangan'], $cellWidth);
         printAlignedTextWithColon($pdf, 'Tanggal', $bookingData['tanggal'], $cellWidth);
@@ -103,15 +99,8 @@ function createBookingPDF($bookingId)
         $pdf->SetFont('Arial', 'I', 10);
         $pdf->Cell(0, 5, 'Terima kasih telah melakukan booking. Hubungi kami untuk informasi lebih lanjut.', 0, 1, 'C');
 
-        $pdf->Ln(5);
         $pdf->SetFont('Arial', '', 12);
-        $pdf->MultiCell($cellWidth, 10, '*Untuk saat ini, kami hanya menerima pembayaran langsung di lokasi. ', 0, 'J');
-
-        $pdf->SetFont('Arial', '', 12);
-        $pdf->MultiCell($cellWidth, 10, '*Harap tunjukkan bukti booking ini kepada petugas saat datang ke lokasi.', 0, 'J');
-
-        $pdf->SetFont('Arial', '', 12);
-        $pdf->MultiCell($cellWidth, 10, '*Mohon Konfirmasi Kedatangan maksimal H-1 dari jadwal yang dipesan', 0, 'J');
+        $pdf->MultiCell($cellWidth, 10, '*Harap tunjukkan bukti booking ini kepada petugas di loket.', 0, 'J');
 
         // Simpan atau tampilkan PDF
         $fileName = 'Bukti_Booking_' . $bookingData['nama'] . '.pdf'; // Nama file PDF sesuai dengan nama pemesan
@@ -129,3 +118,4 @@ if (isset($_GET['booking_id'])) {
 } else {
     echo "ID booking tidak ditemukan.";
 }
+?>

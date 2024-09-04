@@ -121,7 +121,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 </head>
 
 <body>
-
     <div class="container">
         <h1>Registration Form</h1>
         <?php if (!empty($message)) : ?>

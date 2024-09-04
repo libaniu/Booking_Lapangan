@@ -88,19 +88,31 @@ if (!isset($_SESSION["username"])) {
                                 <li class="submenu-item ">
                                     <a href="datalapangan.php">Lapangan</a>
                                 </li>
-
                             </ul>
                         </li>
 
                         <li class="sidebar-item  has-sub">
                             <a href="#" class='sidebar-link'>
                                 <i class="bi bi-collection-fill"></i>
-                                <span>Data Penyewaan</span>
+                                <span>Data Booking</span>
                             </a>
                             <ul class="submenu ">
                                 <li class="submenu-item ">
-                                    <a href="datasewa.php">Data Sewa</a>
+                                    <a href="datasewa.php">Booking</a>
                                 </li>
+                            </ul>                          
+                        </li>
+
+                        <li class="sidebar-item  has-sub">
+                            <a href="#" class='sidebar-link'>
+                                <i class="bi bi-stack"></i>
+                                <span>Data pembayaran</span>
+                            </a>
+                            <ul class="submenu ">
+                                <li class="submenu-item ">
+                                    <a href="databayar.php">Status Pembayaran</a>
+                                </li>
+
                             </ul>
                         </li>
 

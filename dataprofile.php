@@ -171,6 +171,9 @@ $conn->close();
                                 </li>
                                 <li class="submenu-item ">
                                     <a href="statussewa.php">Status Penyewaan</a>
+                                </li>   
+                                <li class="submenu-item ">
+                                    <a href="payement.php">Pembayaran</a>
                                 </li>
                             </ul>
                         </li>

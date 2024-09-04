@@ -92,7 +92,7 @@ if (!isset($_SESSION["username"])) {
                         <li class="sidebar-item  has-sub">
                             <a href="#" class='sidebar-link'>
                                 <i class="bi bi-collection-fill"></i>
-                                <span>Data Penyewaan</span>
+                                <span>Data Booking</span>
                             </a>
                             <ul class="submenu ">
                                 <li class="submenu-item ">
@@ -100,6 +100,20 @@ if (!isset($_SESSION["username"])) {
                                 </li>
                             </ul>
                         </li>
+                        
+                        <li class="sidebar-item  has-sub">
+                            <a href="#" class='sidebar-link'>
+                                <i class="bi bi-stack"></i>
+                                <span>Data pembayaran</span>
+                            </a>
+                            <ul class="submenu ">
+                                <li class="submenu-item ">
+                                    <a href="databayar.php">Status Pembayaran</a>
+                                </li>
+
+                            </ul>
+                        </li>
+
 
                         <li class="sidebar-title">Sign-Out</li>
 

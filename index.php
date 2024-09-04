@@ -49,6 +49,10 @@ $dataJadwal = array_map(function ($jadwal) use ($jdwl) {
     <!-- my style -->
     <link rel="stylesheet" href="css/style.css">
 
+    <script type="text/javascript"
+      src="https://app.sandbox.midtrans.com/snap/snap.js"
+      data-client-key="SB-Mid-client-Xj2FgW1fBxDt0jOh"></script>
+
 </head>
 
 <body>
@@ -101,7 +105,6 @@ $dataJadwal = array_map(function ($jadwal) use ($jdwl) {
                 echo '</div>';
             }
 
-            // Menutup koneksi database
             mysqli_close($conn);
             ?>
         </div>
@@ -110,47 +113,47 @@ $dataJadwal = array_map(function ($jadwal) use ($jdwl) {
 
     <!-- jadwal section  start-->
     <section id="jadwal" class="jadwal">
-        <h2><span>Jadwal</span> Kami</h2>
+    <h2><span>Jadwal</span> Kami</h2>
 
-        <h4 style="text-align:center">Pilih Tanggal</h4>
-        <form action="index.php#jadwal" method="POST" class="form form-vertical">
-            <div class="form-group row">
-                <input type="date" name="tgl" value="<?= ($tgl) ?? '' ?>" class="form-control col-3 col" style="margin: 0.5cm 0 1cm;">
-                <button type="submit" name="submit" class="btn btn-primary form-control col">Cari</button>
-            </div>
-        </form>
-        <?php foreach ($dataJadwal as $val) : ?>
-            <div class="row">
-                <label class="col-3"><?= $val['nama_lapangan'] ?></label>
-                <div class="progress-bar-root-container col">
-                    <div class="label-start">09:00</div>
-                    <div class="progress-bar-container">
-                        <div class="progress-bar" data-start="09:00" data-end="22:00">
-                            <?php if (!empty($val['jadwal_booking'])) : ?>
-                                <?php foreach ($val['jadwal_booking'] as $waktu) : ?>
-                                    <div class="progress" data-start="<?= date('H:i', strtotime($waktu['jam_mulai'])) ?>" data-end="<?= date('H:i', strtotime($waktu['jam_selesai'])) ?>">
-                                        <span class="progress-tooltip"><?= date('H:i', strtotime($waktu['jam_mulai'])) . ' - ' . date('H:i', strtotime($waktu['jam_selesai'])) ?></span>
-                                    </div>
-                                <?php endforeach; ?>
-                            <?php endif; ?>
-                        </div>
+    <h4 style="text-align:center">Pilih Tanggal</h4>
+    <form action="index.php#jadwal" method="POST" class="form form-vertical">
+        <div class="form-group row">
+            <input type="date" name="tgl" value="<?php echo isset($tgl) ? $tgl : ''; ?>" class="form-control col-3 col" style="margin: 0.5cm 0 1cm;">
+            <button type="submit" name="submit" class="btn btn-primary form-control col">Cari</button>
+        </div>
+    </form>
+    <?php foreach ($dataJadwal as $val) : ?>
+        <div class="row">
+            <label class="col-3"><?php echo $val['nama_lapangan']; ?></label>
+            <div class="progress-bar-root-container col">
+                <div class="label-start">09:00</div>
+                <div class="progress-bar-container">
+                    <div class="progress-bar" data-start="09:00" data-end="22:00">
+                        <?php if (!empty($val['jadwal_booking'])) : ?>
+                            <?php foreach ($val['jadwal_booking'] as $waktu) : ?>
+                                <div class="progress" data-start="<?php echo date('H:i', strtotime($waktu['jam_mulai'])); ?>" data-end="<?php echo date('H:i', strtotime($waktu['jam_selesai'])); ?>">
+                                    <span class="progress-tooltip"><?php echo date('H:i', strtotime($waktu['jam_mulai'])) . ' - ' . date('H:i', strtotime($waktu['jam_selesai'])); ?></span>
+                                </div>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
                     </div>
-                    <div class="label-end">22:00</div>
                 </div>
+                <div class="label-end">22:00</div>
             </div>
-        <?php endforeach; ?>
-        <label class="label-1">*Arahkan kursor untuk melihat jam booking</label>
         </div>
-        <div class="box-container mt1-5">
-            <div class="small-box" id="my-progress-bar"></div>
-            <label class="mb1-5">Sudah Dibooking</label>
-        </div>
-        <div class="box-container col-lp">
-            <div class="small-box1" id="my-progress-bar"></div>
-            <label class="mb1-5">Belum Dibooking</label>
-        </div>
+    <?php endforeach; ?>
+    <label class="label-1">*Arahkan kursor untuk melihat jam booking</label>
+    </div>
+    <div class="box-container mt1-5">
+        <div class="small-box" id="my-progress-bar"></div>
+        <label class="mb1-5">Sudah Dibooking</label>
+    </div>
+    <div class="box-container col-lp">
+        <div class="small-box1" id="my-progress-bar"></div>
+        <label class="mb1-5">Belum Dibooking</label>
+    </div>
 
-    </section>
+</section>
     <!-- jadwal section  end-->
 
     <!-- Lokasi section start -->
@@ -179,7 +182,7 @@ $dataJadwal = array_map(function ($jadwal) use ($jdwl) {
             for (var i = 0; i < progress_bars.length; i++) {
 
                 const progress_bar = progress_bars[i];
-                const bar_start = timeToMinutes(progress_bar.dataset.start) // HH:ii
+                const bar_start = timeToMinutes(progress_bar.dataset.start)
                 const bar_end = timeToMinutes(progress_bar.dataset.end)
                 const bar_width = bar_end - bar_start
 

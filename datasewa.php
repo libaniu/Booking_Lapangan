@@ -95,12 +95,25 @@ if (!isset($_SESSION["username"])) {
                         <li class="sidebar-item  has-sub">
                             <a href="#" class='sidebar-link'>
                                 <i class="bi bi-collection-fill"></i>
-                                <span>Data Penyewaan</span>
+                                <span>Data Booking</span>
                             </a>
                             <ul class="submenu ">
                                 <li class="submenu-item ">
-                                    <a href="datasewa.php">Data Sewa</a>
+                                    <a href="datasewa.php">Booking</a>
                                 </li>
+                            </ul>
+                        </li>
+
+                        <li class="sidebar-item  has-sub">
+                            <a href="#" class='sidebar-link'>
+                                <i class="bi bi-stack"></i>
+                                <span>Data pembayaran</span>
+                            </a>
+                            <ul class="submenu ">
+                                <li class="submenu-item ">
+                                    <a href="databayar.php">Status Pembayaran</a>
+                                </li>
+
                             </ul>
                         </li>
 
@@ -127,13 +140,13 @@ if (!isset($_SESSION["username"])) {
                     <div class="row">
                         <div class="row">
                             <div class="col-12 col-md-6 order-md-1 order-last">
-                                <h3>Data Penyewa</h3>
+                                <h3>Data Booking</h3>
                             </div>
                             <div class="col-12 col-md-6 order-md-2 order-first">
                                 <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end">
                                     <ol class="breadcrumb">
                                         <li class="breadcrumb-item"><a href="adminhome.php">Dashboard</a></li>
-                                        <li class="breadcrumb-item active" aria-current="page">DataPenyewa</li>
+                                        <li class="breadcrumb-item active" aria-current="page">DataBooking</li>
                                     </ol>
                                 </nav>
                             </div>

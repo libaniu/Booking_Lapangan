@@ -91,6 +91,9 @@ if (!isset($_SESSION["username"])) {
                                 <li class="submenu-item ">
                                     <a href="statussewa.php">Status Pemesanan</a>
                                 </li>
+                                <li class="submenu-item ">
+                                    <a href="payement.php">Pembayaran</a>
+                                </li>
                             </ul>
                         </li>
 

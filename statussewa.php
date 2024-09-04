@@ -22,13 +22,11 @@ if ($data === false) {
 }
 
 $no = 1;
-$username = $_SESSION['username']; // Ambil username pengguna yang sedang login dari sesi
+// $username = $_SESSION['username']; // Ambil username pengguna yang sedang login dari sesi
 
 $sqlFormSewa = "SELECT fs.id, fs.nama, fs.tanggal, fs.jam_mulai, fs.jam_selesai, lapangan.nama_lapangan
 FROM formsewa fs
-JOIN users u ON fs.nama = u.name
-JOIN lapangan ON lapangan.id_lapangan = fs.id_lapangan
-WHERE u.username = '$username'";
+JOIN lapangan ON lapangan.id_lapangan = fs.id_lapangan";
 $resultFormSewa = mysqli_query($data, $sqlFormSewa);
 
 if (!$resultFormSewa) {
@@ -118,6 +116,9 @@ if (!$resultFormSewa) {
                                 <li class="submenu-item ">
                                     <a href="statussewa.php">Status Pemesanan</a>
                                 </li>
+                                <li class="submenu-item ">
+                                    <a href="payement.php">Pembayaran</a>
+                                </li>
                             </ul>
                         </li>
 
@@ -169,6 +170,7 @@ if (!$resultFormSewa) {
                                         <th>Lama Sewa</th>
                                         <th>Total</th>
                                         <th>Aksi</th>
+                                        <th>Pembatalan</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -193,8 +195,7 @@ if (!$resultFormSewa) {
                                         $tanggal = $formSewa['tanggal'];
                                         $jamMulai = $formSewa['jam_mulai'];
                                         $jamSelesai = $formSewa['jam_selesai'];
-                                        $lamaSewa = round((strtotime($jamSelesai) - strtotime($jamMulai)) / 3600, 2);
-
+                                        $lamaSewa = round((strtotime($jamSelesai) - strtotime($jamMulai)) / 3600, 2);                                       
                                         $total = $harga * $lamaSewa;
                                         ?>
 
@@ -209,13 +210,21 @@ if (!$resultFormSewa) {
                                             <td><?php echo $total; ?> </td>
                                             <td>
                                                 <div class="d-flex gap-2">
-                                                    <a href="bookingpdf.php?booking_id=<?php echo $formSewa['id']; ?>" target="_blank">Unduh Bukti Booking</a>
-                                                    <button class="btn btn-danger btn-delete" data-id="<?php echo $formSewa['id']; ?>">Hapus</button>
+                                                <a href="payement.php" class="btn btn-primary">Bayar</a>
+                                            </div>
+                                            </td>
+                                            <td>
+                                                <div class="d-flex justify-content-between">
+                                                    <div class="d-flex gap-2">
+                                                        <form method="post" action="hapusdatasewauser.php">
+                                                            <input type="hidden" name="id" value="<?php echo $formSewa['id']; ?>">
+                                                            <button type="submit" class="btn btn-danger" name="delete">Batal</button>
+                                                        </form>
                                                 </div>
                                             </td>
                                         </tr>
                                         <?php $no++; ?>
-                                    <?php endwhile; ?>
+                                        <?php endwhile; ?>
 
                                 </tbody>
                             </table>
