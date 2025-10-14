@@ -234,7 +234,7 @@ $conn->close();
                                         </div>
                                         <div class="col-12">
                                             <div class="form-group">
-                                                <label for="jam_selesai">Jam Se lesai</label>
+                                                <label for="jam_selesai">Jam Selesai</label>
                                                 <input type="time" id="jam_selesai" class="form-control" name="jam_selesai" required>
                                             </div>
                                         </div>

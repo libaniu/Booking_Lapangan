@@ -1,7 +1,7 @@
 <?php
-// userhome.php
+// payement.php
 
-session_name("user_session"); // Gunakan nama sesi untuk pengguna
+session_name("user_session");
 session_start();
 
 if (!isset($_SESSION["username"])) {
@@ -9,84 +9,73 @@ if (!isset($_SESSION["username"])) {
     exit;
 }
 
-// Mendapatkan data name dan username dari tabel users (menggunakan contoh koneksi database)
-$servername = "localhost";
-$username = "root";
+$host = "localhost";
+$user = "root";
 $password = "";
-$dbname = "sewalapangan";
+$db = "sewalapangan";
 
-// Membuat koneksi ke database
-$conn = new mysqli($servername, $username, $password, $dbname);
+// Menggunakan koneksi yang konsisten (object-oriented)
+$conn = new mysqli($host, $user, $password, $db);
 
-// Memeriksa koneksi database
 if ($conn->connect_error) {
-    die("Koneksi database gagal: " . $conn->connect_error);
+    die("Kesalahan koneksi: " . $conn->connect_error);
 }
 
-// Mendapatkan data name dan username dari tabel users
-if (isset($_SESSION['username'])) {
-    $username = $_SESSION['username'];
+// Inisialisasi variabel untuk menghindari error
+$name = '';
+$username_session = $_SESSION['username'];
+$booking_id = null;
+$order_id = 'Tidak ada booking';
+$total_bayar = 0;
+$status_booking = '';
 
-    // Mendapatkan data name dari tabel users berdasarkan username
-    $sql = "SELECT name FROM users WHERE username = '$username'";
-    $result = $conn->query($sql);
+// 1. Dapatkan 'name' dari tabel 'users' berdasarkan username sesi
+$stmt_user = $conn->prepare("SELECT name FROM users WHERE username = ?");
+$stmt_user->bind_param("s", $username_session);
+$stmt_user->execute();
+$result_user = $stmt_user->get_result();
 
-    if ($result->num_rows > 0) {
-        $row = $result->fetch_assoc();
-        $name = $row["name"];
-    } else {
-        echo "Tidak ada data yang ditemukan.";
-    }
-
-    // Mendapatkan total pembayaran dari tabel formsewa berdasarkan username
-    $sql = "SELECT order_id, total_bayar FROM formsewa";
-    $result = $conn->query($sql);
-
-    if ($result->num_rows > 0) {
-        $row = $result->fetch_assoc();
-        $order_id = $row["order_id"];
-        $total_bayar = $row["total_bayar"];
-    } else {
-        $order_id = "Tidak ada";
-        $total_bayar = 0;
-    }
-} else {
-    echo "Pengguna belum login.";
+if ($result_user->num_rows > 0) {
+    $user_row = $result_user->fetch_assoc();
+    $name = $user_row['name'];
 }
+$stmt_user->close();
 
-$sqlFormSewa = "SELECT fs.id, fs.nama, fs.tanggal, fs.jam_mulai, fs.jam_selesai, lapangan.nama_lapangan
-FROM formsewa fs
-JOIN lapangan ON lapangan.id_lapangan = fs.id_lapangan";
-$resultFormSewa = mysqli_query($conn, $sqlFormSewa);
 
-if (!$resultFormSewa) {
-    die("Kesalahan query: " . mysqli_error($conn));
+// 2. Jika 'name' ditemukan, dapatkan data booking TERBARU dari 'formsewa'
+if ($name) {
+    // Mengambil booking terbaru dari user yang sedang login
+    $stmt_sewa = $conn->prepare("SELECT id, order_id, total_bayar, status_booking FROM formsewa WHERE nama = ? ORDER BY id DESC LIMIT 1");
+    $stmt_sewa->bind_param("s", $name);
+    $stmt_sewa->execute();
+    $result_sewa = $stmt_sewa->get_result();
+
+    if ($result_sewa->num_rows > 0) {
+        $sewa_row = $result_sewa->fetch_assoc();
+        $booking_id = $sewa_row['id'];
+        $order_id = $sewa_row['order_id'];
+        $total_bayar = $sewa_row['total_bayar'];
+        $status_booking = $sewa_row['status_booking'];
+    }
+    $stmt_sewa->close();
 }
 ?>
 
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Halaman User</title>
-
+    <title>Form Pembayaran</title>
     <link rel="stylesheet" href="dist/assets/css/main/app.css">
     <link rel="stylesheet" href="dist/assets/css/main/app-dark.css">
     <link rel="shortcut icon" href="dist/assets/images/logo/favicon.svg" type="image/x-icon">
     <link rel="shortcut icon" href="dist/assets/images/logo/favicon.png" type="image/png">
-
-    <style>
-        #toggle-dark {
-            display: none;
-        }
-    </style>
-
     <link rel="stylesheet" href="dist/assets/css/shared/iconly.css">
-
+    <style>
+        #toggle-dark { display: none; }
+    </style>
 </head>
-
 <body>
     <div id="app">
         <div id="sidebar" class="active">
@@ -109,8 +98,8 @@ if (!$resultFormSewa) {
                 </div>
                 <div class="sidebar-menu">
                     <ul class="menu">
-                        <li class="sidebar-title">Menu</li>
-                        <li class="sidebar-item active">
+                         <li class="sidebar-title">Menu</li>
+                         <li class="sidebar-item">
                             <a href="userhome.php" class='sidebar-link'>
                                 <i class="bi bi-grid-fill"></i>
                                 <span>Dashboard</span>
@@ -127,19 +116,19 @@ if (!$resultFormSewa) {
                                 </li>
                             </ul>
                         </li>
-                        <li class="sidebar-item has-sub">
+                        <li class="sidebar-item active has-sub">
                             <a href="#" class='sidebar-link'>
                                 <i class="bi bi-collection-fill"></i>
                                 <span>Sewa</span>
                             </a>
-                            <ul class="submenu">
+                            <ul class="submenu active">
                                 <li class="submenu-item">
                                     <a href="formsewa.php">Form Pemesanan</a>
                                 </li>
-                               <li class="submenu-item ">
+                                <li class="submenu-item ">
                                     <a href="statussewa.php">Status Pemesanan</a>
                                 </li>
-                                <li class="submenu-item ">
+                                <li class="submenu-item active">
                                     <a href="payement.php">Pembayaran</a>
                                 </li>
                             </ul>
@@ -170,7 +159,7 @@ if (!$resultFormSewa) {
                         <div class="col-12 col-md-6 order-md-2 order-first">
                             <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end">
                                 <ol class="breadcrumb">
-                                    <li class="breadcrumb-item"><a href="adminhome.php">Dashboard</a></li>
+                                    <li class="breadcrumb-item"><a href="userhome.php">Dashboard</a></li>
                                     <li class="breadcrumb-item active" aria-current="page">Pembayaran</li>
                                 </ol>
                             </nav>
@@ -178,68 +167,52 @@ if (!$resultFormSewa) {
                     </div>
                 </div>
             </div>
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th scope="col">Username</th>
-                        <th scope="col">Order ID</th>
-                        <th scope="col">Total Pembayaran</th>
-                        <th scope="col">Bukti Booking</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td><?php echo htmlspecialchars($username); ?></td>
-                        <td><?php echo htmlspecialchars($order_id); ?></td>
-                        <td><?php echo htmlspecialchars($total_bayar); ?></td>
-                        <?php
-                        $formSewa = mysqli_fetch_assoc($resultFormSewa);
-                        ?>
-                        <td><a href="bookingpdf.php?booking_id=<?php echo $formSewa['id']; ?>" target="_blank">Unduh Bukti Booking</a></td>
-                    </tr>
-                </tbody>
-            </table>
-            <a href="midtrans/examples/snap/checkout-process-simple-version.php?order_id=<?php echo urlencode($order_id); ?>" class="btn btn-primary btn-lg active" role="button" aria-pressed="true">Bayar</a>
+            
+            <section class="section">
+                <div class="card">
+                    <div class="card-body">
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Username</th>
+                                    <th scope="col">Order ID</th>
+                                    <th scope="col">Total Pembayaran</th>
+                                    <th scope="col">Bukti Booking</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><?php echo htmlspecialchars($username_session); ?></td>
+                                    <td><?php echo htmlspecialchars($order_id); ?></td>
+                                    <td><?php echo "Rp " . number_format($total_bayar, 0, ',', '.'); ?></td>
+                                    <td>
+                                        <?php
+                                        // --- KONDISI UNTUK MENAMPILKAN LINK UNDUH ---
+                                        if ($status_booking == 'Approved') {
+                                            // Jika status 'Approved', tampilkan link
+                                            echo '<a href="bookingpdf.php?booking_id=' . $booking_id . '" target="_blank" class="btn btn-success">Unduh Bukti Booking</a>';
+                                        } else {
+                                            // Jika status bukan 'Approved', tampilkan pesan
+                                            echo '<span class="badge bg-info">Menunggu Persetujuan Admin</span>';
+                                        }
+                                        ?>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        
+                        <?php if ($booking_id && $status_booking != 'Approved'): ?>
+                            <a href="midtrans/examples/snap/checkout-process-simple-version.php?order_id=<?php echo urlencode($order_id); ?>" class="btn btn-primary btn-lg active mt-3" role="button" aria-pressed="true">Bayar Sekarang</a>
+                        <?php endif; ?>
+                    </div>
+                </div>
+            </section>
         </div>
     </div>
-   
-   <script>
-        // Function to handle delete button click
-        function handleDelete(event) {
-            const row = event.target.closest('tr'); // Find the closest row to the delete button
-            const bookingId = event.target.dataset.id; // Get the booking ID from the data-id attribute
-            if (confirm('Apakah Anda yakin ingin menghapus data ini?')) {
-                row.remove(); // Remove the row from the table
-                // Perform additional steps here to delete data from the server if required
-                // You can use AJAX to send a request to the server to delete the data from the database.
-            }
-        }
-
-        // Add click event listeners to all delete buttons
-        const deleteButtons = document.querySelectorAll('.btn-delete');
-        deleteButtons.forEach((button) => {
-            button.addEventListener('click', handleDelete);
-        });
-
-        try {
-            const response = await fetch('placepayement.php', {
-                method: 'post',
-                body: data,
-            })
-        } catch(err) {
-            console.log(eer.message);
-        }
-        window.snap.pay('TRANSACTION_TOKEN_HERE');
-    </script>
-
+    
     <script src="dist/assets/js/bootstrap.js"></script>
     <script src="dist/assets/js/app.js"></script>
-
-    <!-- Need: Apexcharts -->
-    <script src="dist/assets/extensions/apexcharts/apexcharts.min.js"></script>
-    <script src="dist/assets/js/pages/dashboard.js"></script>
 </body>
-
 </html>
 <?php
 // Menutup koneksi database

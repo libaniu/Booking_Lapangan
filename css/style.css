@@ -484,3 +484,44 @@ body {
     margin: 0 10px;
   }
 }
+/* Menambahkan style untuk hover di jadwal yang sudah dibooking */
+
+/* Membuat blok jadwal yang sudah di-booking memiliki kursor 'dilarang' */
+.jadwal .progress {
+    position: relative; /* Diperlukan agar tooltip baru bisa diposisikan */
+    cursor: not-allowed; 
+}
+
+/* Menyembunyikan tooltip waktu yang asli saat di-hover */
+.jadwal .progress:hover .progress-tooltip {
+    display: none;
+    opacity: 0;
+}
+
+/* Membuat dan menampilkan tooltip "Tidak Tersedia" saat di-hover */
+.jadwal .progress::after {
+    content: 'Tidak Tersedia'; /* Ini adalah teks yang akan muncul */
+    position: absolute;
+    bottom: calc(100% + 5px); /* Posisi 5px di atas bar */
+    left: 50%;
+    transform: translateX(-50%);
+
+    /* Style untuk kotak tooltip */
+    background-color: #c0392b; /* Warna merah gelap agar jelas */
+    color: #fff;
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-size: 0.8rem;
+    white-space: nowrap; /* Mencegah teks terpotong jadi dua baris */
+    z-index: 10;
+    
+    /* Animasi muncul */
+    opacity: 0; /* Sembunyikan secara default */
+    transition: opacity 0.2s ease-in-out;
+    pointer-events: none; /* Penting agar tidak mengganggu interaksi mouse */
+}
+
+/* Menampilkan tooltip "Tidak Tersedia" saat kursor diarahkan ke bar */
+.jadwal .progress:hover::after {
+    opacity: 1;
+}

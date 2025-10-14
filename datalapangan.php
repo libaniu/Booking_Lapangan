@@ -39,9 +39,16 @@ $result = mysqli_query($conn, $sql);
             display: none;
         }
 
+        /* Saya ganti warna btn-edit menjadi warna kuning (warning) yang umum untuk edit */
         .btn-edit {
-            background-color: #008000;
+            background-color: #ffc107;
             color: white;
+            border-color: #ffc107;
+        }
+        .preview-img {
+             max-width: 150px; 
+             margin-top: 10px; 
+             border-radius: 5px;
         }
     </style>
 
@@ -153,123 +160,168 @@ $result = mysqli_query($conn, $sql);
             <div class="page-heading">
                 <div class="page-title">
                     <div class="row">
-                        <div class="row">
-                            <div class="col-12 col-md-6 order-md-1 order-last">
-                                <h3>Data Lapangan</h3>
-
-                            </div>
-                            <div class="col-12 col-md-6 order-md-2 order-first">
-                                <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end">
-                                    <ol class="breadcrumb">
-                                        <li class="breadcrumb-item"><a href="adminhome.php">Dashboard</a></li>
-                                        <li class="breadcrumb-item active" aria-current="page">DataLapangan</li>
-                                    </ol>
-                                </nav>
-                            </div>
+                        <div class="col-12 col-md-6 order-md-1 order-last">
+                            <h3>Data Lapangan</h3>
+                        </div>
+                        <div class="col-12 col-md-6 order-md-2 order-first">
+                            <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end">
+                                <ol class="breadcrumb">
+                                    <li class="breadcrumb-item"><a href="adminhome.php">Dashboard</a></li>
+                                    <li class="breadcrumb-item active" aria-current="page">DataLapangan</li>
+                                </ol>
+                            </nav>
                         </div>
                     </div>
-                    <section class="section">
-                        <div class="card">
+                </div>
+                <section class="section">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="buttons">
+                                <button type="button" class="btn btn-outline-success" data-bs-toggle="modal" data-bs-target="#inlineForm">
+                                    Tambahkan Lapangan
+                                </button>
+                            </div>
 
-
-                            <div class="card-body">
-                                <div class="buttons">
-                                    <button type="button" class="btn btn-outline-success" data-bs-toggle="modal" data-bs-target="#inlineForm">
-                                        Tambahkan Lapangan
-                                    </button>
-                                </div>
-
-                                <div class="modal fade text-left" id="inlineForm" tabindex="-1" role="dialog" aria-labelledby="myModalLabel33" aria-hidden="true">
-                                    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" role="document">
-                                        <div class="modal-content">
-                                            <div class="modal-header">
-                                                <h4 class="modal-title" id="myModalLabel33">Tambah Lapangan</h4>
-                                                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Tutup">
-                                                    <i data-feather="x" class="d-block d-sm-none"></i>
-                                                </button>
-                                            </div>
-                                            <form action="lapangan.php" method="POST" enctype="multipart/form-data">
-                                                <div class="modal-body">
-                                                    <label>Nama Lapangan:</label>
-                                                    <div class="form-group">
-                                                        <input type="text" name="nama_lapangan" placeholder="Nama Lapangan" class="form-control">
-                                                    </div>
-                                                    <label>Harga Sewa:</label>
-                                                    <div class="form-group">
-                                                        <input type="text" name="harga_sewa" placeholder="Harga Sewa" class="form-control">
-                                                    </div>
-                                                    <label>Unggah Gambar:</label>
-                                                    <div class="form-group">
-                                                        <input type="file" name="gambar" class="form-control-file">
-                                                    </div>
-                                                </div>
-                                                <div class="modal-footer">
-                                                    <button type="button" class="btn btn-light-secondary" data-bs-dismiss="modal">
-                                                        <i class="bx bx-x d-inline d-sm-none"></i>
-                                                        <span class="d-inline d-sm-none">Tutup</span>
-                                                        <span class="d-none d-sm-inline">Tutup</span>
-                                                    </button>
-                                                    <button type="submit" name="submit" class="btn btn-primary ml-1">
-                                                        <i class="bx bx-check d-inline d-sm-none"></i>
-                                                        <span class="d-inline d-sm-none">Tambahkan</span>
-                                                        <span class="d-none d-sm-inline">Tambahkan</span>
-                                                    </button>
-                                                </div>
-                                            </form>
+                            <div class="modal fade text-left" id="inlineForm" tabindex="-1" role="dialog" aria-labelledby="myModalLabel33" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h4 class="modal-title" id="myModalLabel33">Tambah Lapangan</h4>
+                                            <button type="button" class="close" data-bs-dismiss="modal" aria-label="Tutup">
+                                                <i data-feather="x" class="d-block d-sm-none"></i>
+                                            </button>
                                         </div>
+                                        <form action="lapangan.php" method="POST" enctype="multipart/form-data">
+                                            <div class="modal-body">
+                                                <label>Nama Lapangan:</label>
+                                                <div class="form-group"><input type="text" name="nama_lapangan" placeholder="Nama Lapangan" class="form-control"></div>
+                                                <label>Harga Sewa:</label>
+                                                <div class="form-group"><input type="text" name="harga_sewa" placeholder="Harga Sewa" class="form-control"></div>
+                                                <label>Unggah Gambar:</label>
+                                                <div class="form-group"><input type="file" name="gambar" class="form-control-file"></div>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-light-secondary" data-bs-dismiss="modal"><span class="d-none d-sm-inline">Tutup</span></button>
+                                                <button type="submit" name="submit" class="btn btn-primary ml-1"><span class="d-none d-sm-inline">Tambahkan</span></button>
+                                            </div>
+                                        </form>
                                     </div>
                                 </div>
                             </div>
-
-
-                            <div class="card-body">
-                                <table class="table table-striped" id="table1">
-                                    <thead>
-                                        <tr>
-                                            <th>No</th>
-                                            <th>Nama Lapangan</th>
-                                            <th>Harga Sewa</th>
-                                            <th>Gambar</th>
-                                            <th>Aksi</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <?php
-                                        $nomor = 1; // Tambahkan deklarasi variabel nomor sebelum loop
-                                        while ($row = mysqli_fetch_assoc($result)) :
-                                        ?>
-                                            <tr>
-                                                <td><?php echo $nomor; ?></td> <!-- Menampilkan nomor berurutan -->
-                                                <td><?php echo $row['nama_lapangan']; ?></td>
-                                                <td><?php echo $row['harga_sewa']; ?></td>
-
-                                                <td><img src="<?php echo $row['gambar']; ?>" width="100">
-
-                                                </td>
-                                                <td>
-                                                    <div class="d-flex gap-2">
-                                                        <a href="hapuslapangan.php?id=<?= $row['id_lapangan'] ?>"><button class="btn btn-danger">Hapus</button></a>
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                            <?php $nomor++; // Tambahkan 1 ke nomor setiap iterasi 
-                                            ?>
-                                        <?php endwhile; ?>
-                                    </tbody>
-                                </table>
-                            </div>
                         </div>
-                    </section>
-                </div>
+
+                        <div class="card-body">
+                            <table class="table table-striped" id="table1">
+                                <thead>
+                                    <tr>
+                                        <th>No</th>
+                                        <th>Nama Lapangan</th>
+                                        <th>Harga Sewa</th>
+                                        <th>Gambar</th>
+                                        <th>Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php
+                                    $nomor = 1;
+                                    while ($row = mysqli_fetch_assoc($result)) :
+                                    ?>
+                                        <tr>
+                                            <td><?php echo $nomor; ?></td>
+                                            <td><?php echo htmlspecialchars($row['nama_lapangan']); ?></td>
+                                            <td><?php echo htmlspecialchars($row['harga_sewa']); ?></td>
+                                            <td><img src="<?php echo htmlspecialchars($row['gambar']); ?>" width="100"></td>
+                                            <td>
+                                                <div class="d-flex gap-2">
+                                                    <button type="button" class="btn btn-warning" 
+                                                            data-bs-toggle="modal" 
+                                                            data-bs-target="#editModal"
+                                                            data-id="<?= $row['id_lapangan'] ?>"
+                                                            data-nama="<?= htmlspecialchars($row['nama_lapangan']) ?>"
+                                                            data-harga="<?= htmlspecialchars($row['harga_sewa']) ?>"
+                                                            data-gambar="<?= htmlspecialchars($row['gambar']) ?>">
+                                                        Edit
+                                                    </button>
+                                                    
+                                                    <a href="hapuslapangan.php?id=<?= $row['id_lapangan'] ?>"><button class="btn btn-danger">Hapus</button></a>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    <?php $nomor++;
+                                    endwhile; ?>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
             </div>
         </div>
-        <script src="dist/assets/js/bootstrap.js"></script>
-        <script src="dist/assets/js/app.js"></script>
+    </div>
 
-        <!-- Need: Apexcharts -->
-        <script src="dist/assets/extensions/apexcharts/apexcharts.min.js"></script>
-        <script src="dist/assets/js/pages/dashboard.js"></script>
+    <div class="modal fade text-left" id="editModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabelEdit" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="myModalLabelEdit">Edit Lapangan</h4>
+                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Tutup">
+                        <i data-feather="x"></i>
+                    </button>
+                </div>
+                <form action="updatelapangan.php" method="POST" enctype="multipart/form-data">
+                    <div class="modal-body">
+                        <input type="hidden" name="id_lapangan" id="edit_id_lapangan">
+                        <label>Nama Lapangan:</label>
+                        <div class="form-group">
+                            <input type="text" name="nama_lapangan" id="edit_nama_lapangan" class="form-control" required>
+                        </div>
+                        <label>Harga Sewa:</label>
+                        <div class="form-group">
+                            <input type="number" name="harga_sewa" id="edit_harga_sewa" class="form-control" required>
+                        </div>
+                        <label>Gambar Saat Ini:</label>
+                        <div>
+                            <img src="" id="edit_preview_gambar" class="preview-img">
+                        </div><br>
+                        <label>Unggah Gambar Baru (Kosongkan jika tidak diubah):</label>
+                        <div class="form-group">
+                            <input type="file" name="gambar" class="form-control">
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-light-secondary" data-bs-dismiss="modal">
+                            <span class="d-none d-sm-inline">Batal</span>
+                        </button>
+                        <button type="submit" name="update" class="btn btn-primary ml-1">
+                            <span class="d-none d-sm-inline">Simpan Perubahan</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <script src="dist/assets/js/bootstrap.js"></script>
+    <script src="dist/assets/js/app.js"></script>
+    <script src="dist/assets/extensions/apexcharts/apexcharts.min.js"></script>
+    <script src="dist/assets/js/pages/dashboard.js"></script>
 
+    <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var editModal = document.getElementById('editModal');
+        editModal.addEventListener('show.bs.modal', function (event) {
+            var button = event.relatedTarget;
+            var id = button.getAttribute('data-id');
+            var nama = button.getAttribute('data-nama');
+            var harga = button.getAttribute('data-harga');
+            var gambar = button.getAttribute('data-gambar');
+
+            var modal = this;
+            modal.querySelector('#edit_id_lapangan').value = id;
+            modal.querySelector('#edit_nama_lapangan').value = nama;
+            modal.querySelector('#edit_harga_sewa').value = harga;
+            modal.querySelector('#edit_preview_gambar').src = gambar;
+        });
+    });
+    </script>
 </body>
-
 </html>

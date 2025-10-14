@@ -24,7 +24,7 @@ if ($data === false) {
 $no = 1;
 // $username = $_SESSION['username']; // Ambil username pengguna yang sedang login dari sesi
 
-$sqlFormSewa = "SELECT fs.id, fs.nama, fs.tanggal, fs.jam_mulai, fs.jam_selesai, lapangan.nama_lapangan
+$sqlFormSewa = "SELECT fs.id, fs.nama, fs.tanggal, fs.jam_mulai, fs.jam_selesai, lapangan.nama_lapangan, fs.status_booking
 FROM formsewa fs
 JOIN lapangan ON lapangan.id_lapangan = fs.id_lapangan";
 $resultFormSewa = mysqli_query($data, $sqlFormSewa);
@@ -148,7 +148,7 @@ if (!$resultFormSewa) {
                         <div class="col-12 col-md-6 order-md-2 order-first">
                             <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end">
                                 <ol class="breadcrumb">
-                                    <li class="breadcrumb-item"><a href="adminhome.php">Dashboard</a></li>
+                                    <li class="breadcrumb-item"><a href="userhome.php">Dashboard</a></li>
                                     <li class="breadcrumb-item active" aria-current="page">Status Pemesanan</li>
                                 </ol>
                             </nav>
@@ -158,7 +158,7 @@ if (!$resultFormSewa) {
                 <section class="section">
                     <div class="card">
                         <div class="card-body">
-                            <table class="table table-striped" id="table1" style="max-width: 800px;">
+                            <table class="table table-striped" id="table1">
                                 <thead>
                                     <tr>
                                         <th>No</th>
@@ -170,7 +170,7 @@ if (!$resultFormSewa) {
                                         <th>Lama Sewa</th>
                                         <th>Total</th>
                                         <th>Aksi</th>
-                                        <th>Pembatalan</th>
+                                        <th>Status</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -195,36 +195,43 @@ if (!$resultFormSewa) {
                                         $tanggal = $formSewa['tanggal'];
                                         $jamMulai = $formSewa['jam_mulai'];
                                         $jamSelesai = $formSewa['jam_selesai'];
-                                        $lamaSewa = round((strtotime($jamSelesai) - strtotime($jamMulai)) / 3600, 2);                                       
+                                        $lamaSewa = round((strtotime($jamSelesai) - strtotime($jamMulai)) / 3600, 2);
                                         $total = $harga * $lamaSewa;
                                         ?>
 
                                         <tr>
                                             <td><?php echo $no; ?></td>
                                             <td><?php echo $namaLapangan; ?></td>
-                                            <td><?php echo $harga; ?></td>
-                                            <td><?php echo $tanggal; ?></td>
-                                            <td><?php echo $jamMulai; ?></td>
-                                            <td><?php echo $jamSelesai; ?></td>
+                                            <td><?php echo "Rp " . number_format($harga, 0, ',', '.'); ?></td>
+                                            <td><?php echo date('d-m-Y', strtotime($tanggal)); ?></td>
+                                            <td><?php echo date('H:i', strtotime($jamMulai)); ?></td>
+                                            <td><?php echo date('H:i', strtotime($jamSelesai)); ?></td>
                                             <td><?php echo $lamaSewa; ?> jam</td>
-                                            <td><?php echo $total; ?> </td>
+                                            <td><?php echo "Rp " . number_format($total, 0, ',', '.'); ?></td>
                                             <td>
                                                 <div class="d-flex gap-2">
-                                                <a href="payement.php" class="btn btn-primary">Bayar</a>
-                                            </div>
+                                                    <a href="payement.php" class="btn btn-primary">Bayar</a>
+                                                    <form method="post" action="hapusdatasewauser.php" onsubmit="return confirm('Apakah Anda yakin ingin membatalkan pesanan ini?');">
+                                                        <input type="hidden" name="id" value="<?php echo $formSewa['id']; ?>">
+                                                        <button type="submit" class="btn btn-danger" name="delete">Batal</button>
+                                                    </form>
+                                                </div>
                                             </td>
                                             <td>
-                                                <div class="d-flex justify-content-between">
-                                                    <div class="d-flex gap-2">
-                                                        <form method="post" action="hapusdatasewauser.php">
-                                                            <input type="hidden" name="id" value="<?php echo $formSewa['id']; ?>">
-                                                            <button type="submit" class="btn btn-danger" name="delete">Batal</button>
-                                                        </form>
-                                                </div>
+                                                <?php
+                                                $status = $formSewa['status_booking'];
+                                                if ($status == 'Pending') {
+                                                    echo '<span class="badge bg-warning">Pending</span>';
+                                                } elseif ($status == 'Approved') {
+                                                    echo '<span class="badge bg-success">Approved</span>';
+                                                } else {
+                                                    echo '<span class="badge bg-secondary">' . htmlspecialchars($status) . '</span>';
+                                                }
+                                                ?>
                                             </td>
                                         </tr>
                                         <?php $no++; ?>
-                                        <?php endwhile; ?>
+                                    <?php endwhile; ?>
 
                                 </tbody>
                             </table>
@@ -235,29 +242,9 @@ if (!$resultFormSewa) {
         </div>
     </div>
 
-    <script>
-        // Function to handle delete button click
-        function handleDelete(event) {
-            const row = event.target.closest('tr'); // Find the closest row to the delete button
-            const bookingId = event.target.dataset.id; // Get the booking ID from the data-id attribute
-            if (confirm('Apakah Anda yakin ingin menghapus data ini?')) {
-                row.remove(); // Remove the row from the table
-                // Perform additional steps here to delete data from the server if required
-                // You can use AJAX to send a request to the server to delete the data from the database.
-            }
-        }
-
-        // Add click event listeners to all delete buttons
-        const deleteButtons = document.querySelectorAll('.btn-delete');
-        deleteButtons.forEach((button) => {
-            button.addEventListener('click', handleDelete);
-        });
-    </script>
-
     <script src="dist/assets/js/bootstrap.js"></script>
     <script src="dist/assets/js/app.js"></script>
 
-    <!-- Need: Apexcharts -->
     <script src="dist/assets/extensions/apexcharts/apexcharts.min.js"></script>
     <script src="dist/assets/js/pages/dashboard.js"></script>
 </body>

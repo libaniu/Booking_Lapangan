@@ -1,30 +1,45 @@
 <?php
+
 $host = "localhost";
 $user = "root";
 $password = "";
 $db = "sewalapangan";
 $conn = mysqli_connect($host, $user, $password, $db);
+
+if ($conn === false) {
+    die("FATAL ERROR: Tidak dapat terhubung ke database. " . mysqli_connect_error());
+}
+
 $dataJadwal = [];
 $tgl = date('Y-m-d');
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
+
+if ($_SERVER["REQUEST_METHOD"] == "POST" && !empty($_POST['tgl'])) {
     $tgl = $_POST['tgl'];
 }
 
 $querylpg = mysqli_query($conn, "SELECT id_lapangan, nama_lapangan FROM lapangan");
 $lpg = mysqli_fetch_all($querylpg, MYSQLI_ASSOC);
 
-$queryjadwal = mysqli_query($conn, "SELECT id_lapangan, tanggal, jam_mulai, jam_selesai FROM formsewa WHERE tanggal = '$tgl'");
-$jdwl = mysqli_fetch_all($queryjadwal, MYSQLI_ASSOC);
+$status_approved = 'Approved';
+$stmt = mysqli_prepare($conn, "SELECT id_lapangan, tanggal, jam_mulai, jam_selesai 
+                                 FROM formsewa 
+                                 WHERE tanggal = ? AND status_booking = ?");
+                                 
+mysqli_stmt_bind_param($stmt, "ss", $tgl, $status_approved);
+mysqli_stmt_execute($stmt);
+$result_jadwal = mysqli_stmt_get_result($stmt);
+$jdwl = mysqli_fetch_all($result_jadwal, MYSQLI_ASSOC);
+mysqli_stmt_close($stmt);
 
-$dataJadwal = array_map(function ($jadwal) use ($jdwl) {
+$dataJadwal = array_map(function ($lapangan) use ($jdwl) {
     $data = [];
     foreach ($jdwl as $value) {
-        if ($value['id_lapangan'] === $jadwal['id_lapangan']) {
+        if ($value['id_lapangan'] == $lapangan['id_lapangan']) { 
             $data[] = $value;
         }
-        $jadwal['jadwal_booking'] = $data;
     }
-    return $jadwal;
+    $lapangan['jadwal_booking'] = $data;
+    return $lapangan;
 }, $lpg);
 
 ?>
@@ -38,15 +53,12 @@ $dataJadwal = array_map(function ($jadwal) use ($jdwl) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AWK FUTSAL</title>
 
-    <!-- fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@100;300;400;700&display=swap" rel="stylesheet">
 
-    <!-- feather icons -->
     <script src="https://unpkg.com/feather-icons"></script>
 
-    <!-- my style -->
     <link rel="stylesheet" href="css/style.css">
 
     <script type="text/javascript"
@@ -56,7 +68,6 @@ $dataJadwal = array_map(function ($jadwal) use ($jdwl) {
 </head>
 
 <body>
-    <!-- Navbar start -->
     <nav class="navbar">
         <a href="#" class="navbar-logo"><span>AWK</span> Futsal.</a>
 
@@ -71,9 +82,6 @@ $dataJadwal = array_map(function ($jadwal) use ($jdwl) {
             <a href="#" id="hamburger-menu"><i data-feather="menu"></i></a>
         </div>
     </nav>
-    <!-- Navbar end -->
-
-    <!-- Hero section start -->
     <section class="hero" id="home">
         <main class="content">
             <h1>BOOKING LAPANGAN AWK FUTSAL</h1>
@@ -82,9 +90,6 @@ $dataJadwal = array_map(function ($jadwal) use ($jdwl) {
             <a href="register.php" class="register">Register</a>
         </main>
     </section>
-    <!-- Hero section end -->
-
-    <!-- about section start -->
     <section id="lapangan" class="lapangan">
         <h2><span>Lapangan</span> Kami</h2>
 
@@ -104,14 +109,9 @@ $dataJadwal = array_map(function ($jadwal) use ($jdwl) {
                 echo '<p class="lapangan-card-price">Harga Rp.' . $harga_sewa . '</p>';
                 echo '</div>';
             }
-
-            mysqli_close($conn);
             ?>
         </div>
     </section>
-    <!-- about section end -->
-
-    <!-- jadwal section  start-->
     <section id="jadwal" class="jadwal">
     <h2><span>Jadwal</span> Kami</h2>
 
@@ -132,7 +132,7 @@ $dataJadwal = array_map(function ($jadwal) use ($jdwl) {
                         <?php if (!empty($val['jadwal_booking'])) : ?>
                             <?php foreach ($val['jadwal_booking'] as $waktu) : ?>
                                 <div class="progress" data-start="<?php echo date('H:i', strtotime($waktu['jam_mulai'])); ?>" data-end="<?php echo date('H:i', strtotime($waktu['jam_selesai'])); ?>">
-                                    <span class="progress-tooltip"><?php echo date('H:i', strtotime($waktu['jam_mulai'])) . ' - ' . date('H:i', strtotime($waktu['jam_selesai'])); ?></span>
+                                    <span class="progress-tooltip"><b>Tidak Tersedia</b><br><?php echo date('H:i', strtotime($waktu['jam_mulai'])) . ' - ' . date('H:i', strtotime($waktu['jam_selesai'])); ?></span>
                                 </div>
                             <?php endforeach; ?>
                         <?php endif; ?>
@@ -154,9 +154,6 @@ $dataJadwal = array_map(function ($jadwal) use ($jdwl) {
     </div>
 
 </section>
-    <!-- jadwal section  end-->
-
-    <!-- Lokasi section start -->
     <section id="lokasi" class="lokasi">
         <h2><span>Lokasi</span> Kami</h2>
 
@@ -165,15 +162,10 @@ $dataJadwal = array_map(function ($jadwal) use ($jdwl) {
         </div>
 
     </section>
-    <!-- Lokasi section end -->
-
-
-    <!-- feather icons -->
     <script>
         feather.replace()
     </script>
 
-    <!-- My Javascript -->
     <script src="js/script.js"></script>
     <script>
         window.onload = function() {
@@ -213,6 +205,9 @@ $dataJadwal = array_map(function ($jadwal) use ($jdwl) {
         }
     </script>
 
+<?php
+    mysqli_close($conn);
+?>
 </body>
 
 </html>
