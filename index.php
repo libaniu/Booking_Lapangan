@@ -61,7 +61,7 @@ $dataJadwal = array_map(function ($jadwal) use ($jdwl) {
         <a href="#" class="navbar-logo"><span>AWK</span> Futsal.</a>
 
         <div class="navbar-nav">
-            <a href="#home">Home</a>
+            <a href="#home">Beranda</a>
             <a href="#lapangan">Lapangan</a>
             <a href="#jadwal">Jadwal</a>
             <a href="#lokasi">Lokasi</a>
@@ -76,10 +76,10 @@ $dataJadwal = array_map(function ($jadwal) use ($jdwl) {
     <!-- Hero section start -->
     <section class="hero" id="home">
         <main class="content">
-            <h1>BOOKING LAPANGAN AWK FUTSAL</h1>
-            <p>Login terlebih dahulu untuk melakukan booking</p>
-            <a href="login.php" class="login">Login</a>
-            <a href="register.php" class="register">Register</a>
+            <h1>PEMESANAN LAPANGAN AWK FUTSAL</h1>
+            <p>Masuk terlebih dahulu untuk melakukan pemesanan</p>
+            <a href="login.php" class="login">Masuk</a>
+            <a href="register.php" class="register">Daftar</a>
         </main>
     </section>
     <!-- Hero section end -->
@@ -142,15 +142,15 @@ $dataJadwal = array_map(function ($jadwal) use ($jdwl) {
             </div>
         </div>
     <?php endforeach; ?>
-    <label class="label-1">*Arahkan kursor untuk melihat jam booking</label>
+    <label class="label-1">*Arahkan kursor untuk melihat jam pesanan</label>
     </div>
     <div class="box-container mt1-5">
         <div class="small-box" id="my-progress-bar"></div>
-        <label class="mb1-5">Sudah Dibooking</label>
+        <label class="mb1-5">Sudah Dipesan</label>
     </div>
     <div class="box-container col-lp">
         <div class="small-box1" id="my-progress-bar"></div>
-        <label class="mb1-5">Belum Dibooking</label>
+        <label class="mb1-5">Belum Dipesan</label>
     </div>
 
 </section>

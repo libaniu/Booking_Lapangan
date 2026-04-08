@@ -19,7 +19,7 @@ if (isset($_POST['delete'])) {
 
     if ($resultDelete) {
         // Redirect back to the page after successful deletion
-        header("Location: datasewa.php"); // Change "index.php" to the page where the table is located
+        header("Location: admin/datasewa.php"); // Change "index.php" to the page where the table is located
         exit();
     } else {
         die("Delete error: " . mysqli_error($data));

@@ -40,4 +40,4 @@ mysqli_close($conn);
 $response_json = json_encode($response);
 
 // Mengirim respon ke halaman datalapangan.php
-header("Location: http://localhost/sewalapanganfutsal/datalapangan.php?response=" . urlencode($response_json));
+header("Location: admin/datalapangan.php?response=" . urlencode($response_json));

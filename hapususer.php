@@ -17,7 +17,7 @@ if (isset($_GET['id']) && is_numeric($_GET['id'])) {
 
     if ($result) {
         // Jika penghapusan berhasil, arahkan kembali ke halaman datauser.php
-        header("Location: datauser.php");
+        header("Location: admin/datauser.php");
         exit;
     } else {
         // Jika terjadi kesalahan, tampilkan pesan kesalahan
