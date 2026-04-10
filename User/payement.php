@@ -62,9 +62,16 @@ $first_pending_order_id = null;
         #toggle-dark {
             display: none;
         }
+        .table tbody td {
+            color: #D1D1D1 !important;
+        }
     </style>
 
     <link rel="stylesheet" href="../dist/assets/css/shared/iconly.css">
+    <link rel="stylesheet" href="../dist/assets/extensions/sweetalert2/sweetalert2.min.css">
+    
+    <!-- Midtrans Snap JS -->
+    <script type="text/javascript" src="https://app.sandbox.midtrans.com/snap/snap.js" data-client-key="SB-Mid-client-Xj2FgW1fBxDt0jOh"></script>
 
 </head>
 
@@ -167,8 +174,8 @@ $first_pending_order_id = null;
                     <div class="card shadow-sm border-0">
                         <div class="card-body mt-3">
                             <div class="table-responsive">
-                                <table class="table table-sm table-striped table-hover table-bordered mb-0" style="width: 100%; white-space: nowrap;">
-                                    <thead class="table-dark text-white">
+                                <table class="table table-sm table-striped table-hover table-bordered mb-0" style="width: 100%; font-size: 0.9rem;">
+                                    <thead>
                                         <tr class="text-center">
                                             <th>Username</th>
                                             <th>Order ID</th>
@@ -219,7 +226,7 @@ $first_pending_order_id = null;
                             </div>
                             <?php if ($first_pending_order_id !== null) : ?>
                                 <div class="d-flex justify-content-end mt-3">
-                                    <a href="../midtrans/examples/snap/checkout-process-simple-version.php?order_id=<?php echo urlencode($first_pending_order_id); ?>" class="btn btn-primary shadow-sm" role="button" aria-pressed="true"><i class="bi bi-wallet2"></i> Bayar Sekarang</a>
+                                    <button id="pay-button" data-order="<?php echo htmlspecialchars($first_pending_order_id); ?>" class="btn btn-primary shadow-sm"><i class="bi bi-wallet2"></i> Bayar Sekarang</button>
                                 </div>
                             <?php endif; ?>
                         </div>
@@ -247,23 +254,91 @@ $first_pending_order_id = null;
             button.addEventListener('click', handleDelete);
         });
 
-        try {
-            const response = await fetch('../placepayement.php', {
-                method: 'post',
-                body: data,
-            })
-        } catch(err) {
-            console.log(eer.message);
+        // Handler untuk tombol Bayar Sekarang dengan Midtrans Snap
+        const payButton = document.getElementById('pay-button');
+        if (payButton) {
+            payButton.addEventListener('click', async function(e) {
+                e.preventDefault();
+                const orderId = this.getAttribute('data-order');
+                
+                // Ubah state tombol menjadi loading
+                const originalText = this.innerHTML;
+                this.innerHTML = 'Memproses...';
+                this.disabled = true;
+
+                try {
+                    // Fetch token dari backend
+                    const formData = new FormData();
+                    formData.append('order_id', orderId);
+
+                    // Sesuaikan endpoint di bawah ini dengan file PHP yang men-generate snap token Anda
+                    const response = await fetch('../placepayement.php', { 
+                        method: 'POST',
+                        body: formData,
+                    });
+                    
+                    const data = await response.json();
+                    
+                    if (data.token) {
+                        // Panggil pop-up Midtrans Snap
+                        window.snap.pay(data.token, {
+                            onSuccess: function(result){
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Pembayaran Berhasil!',
+                                    text: 'Terima kasih telah menyelesaikan pembayaran.',
+                                    showConfirmButton: false,
+                                    timer: 2000
+                                }).then(() => {
+                                    window.location.reload();
+                                });
+                            },
+                            onPending: function(result){
+                                Swal.fire({
+                                    icon: 'info',
+                                    title: 'Menunggu Pembayaran',
+                                    text: 'Silakan selesaikan pembayaran Anda sesuai petunjuk Midtrans.',
+                                    confirmButtonText: 'Tutup'
+                                }).then(() => {
+                                    window.location.reload();
+                                });
+                            },
+                            onError: function(result){
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Pembayaran Gagal',
+                                    text: 'Terjadi kesalahan pada saat memproses pembayaran Anda.',
+                                    confirmButtonText: 'Tutup'
+                                });
+                            },
+                            onClose: function(){
+                                Swal.fire({
+                                    icon: 'warning',
+                                    title: 'Pembayaran Dibatalkan',
+                                    text: 'Anda menutup pop-up tanpa menyelesaikan pembayaran.',
+                                    confirmButtonText: 'Tutup'
+                                });
+                            }
+                        });
+                    } else {
+                        Swal.fire('Oops...', 'Gagal mendapatkan token transaksi dari server.', 'error');
+                    }
+                } catch(err) {
+                    console.log(err.message);
+                    Swal.fire('Terjadi Kesalahan', 'Terjadi kesalahan saat memproses pembayaran.', 'error');
+                } finally {
+                    // Kembalikan state tombol
+                    this.innerHTML = originalText;
+                    this.disabled = false;
+                }
+            });
         }
-        window.snap.pay('TRANSACTION_TOKEN_HERE');
     </script>
 
+    <script src="../dist/assets/extensions/sweetalert2/sweetalert2.min.js"></script>
     <script src="../dist/assets/js/bootstrap.js"></script>
     <script src="../dist/assets/js/app.js"></script>
 
-    <!-- Need: Apexcharts -->
-    <script src="../dist/assets/extensions/apexcharts/apexcharts.min.js"></script>
-    <script src="../dist/assets/js/pages/dashboard.js"></script>
 </body>
 
 </html>

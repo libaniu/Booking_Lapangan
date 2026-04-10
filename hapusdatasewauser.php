@@ -1,4 +1,12 @@
 <?php
+session_name("user_session");
+session_start();
+
+if (!isset($_SESSION["username"])) {
+    header("location: login.php");
+    exit;
+}
+
 $host = "localhost";
 $user = "root";
 $password = "";
@@ -13,15 +21,19 @@ if ($data === false) {
 if (isset($_POST['delete'])) {
     $id = $_POST['id'];
 
-    // Perform the delete operation
-    $sqlDelete = "DELETE FROM formsewa WHERE id = '$id'";
-    $resultDelete = mysqli_query($data, $sqlDelete);
+    // Menggunakan prepared statement untuk mencegah SQL Injection
+    $sqlDelete = "DELETE FROM formsewa WHERE id = ?";
+    $stmt = mysqli_prepare($data, $sqlDelete);
+    mysqli_stmt_bind_param($stmt, "i", $id);
+    $resultDelete = mysqli_stmt_execute($stmt);
 
     if ($resultDelete) {
-        // Redirect back to the page after successful deletion
-        header("Location: statussewa.php"); // Change "index.php" to the page where the table is located
+        header("Location: User/statussewa.php");
         exit();
     } else {
         die("Delete error: " . mysqli_error($data));
     }
+    mysqli_stmt_close($stmt);
 }
+mysqli_close($data);
+?>

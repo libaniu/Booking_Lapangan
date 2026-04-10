@@ -68,6 +68,7 @@ if (!$resultFormSewa) {
     </style>
 
     <link rel="stylesheet" href="../dist/assets/css/shared/iconly.css">
+    <link rel="stylesheet" href="../dist/assets/extensions/sweetalert2/sweetalert2.min.css">
 </head>
 
 <body>
@@ -190,6 +191,7 @@ if (!$resultFormSewa) {
                                             <th>Jam Selesai</th>
                                             <th>Lama Sewa</th>
                                             <th>Total</th>
+                                            <th>Status</th>
                                             <th>Aksi</th>
                                         </tr>
                                     </thead>
@@ -213,9 +215,24 @@ if (!$resultFormSewa) {
                                                 <td><?= $lamaSewa; ?> jam</td>
                                                 <td class="fw-bold text-success">Rp <?= number_format($total, 0, ',', '.'); ?></td>
                                                 <td>
+                                                    <?php 
+                                                    $status = $formSewa['status_booking']; 
+                                                    $statusClass = '';
+                                                    if ($status == 'Pending' || $status == '1') $statusClass = 'bg-warning text-dark';
+                                                    elseif ($status == 'Approved') $statusClass = 'bg-success text-white';
+                                                    elseif ($status == 'Rejected') $statusClass = 'bg-danger text-white';
+                                                    ?>
+                                                    <select class="form-select form-select-sm status-dropdown shadow-sm <?= $statusClass; ?>" data-id="<?= $formSewa['id']; ?>">
+                                                        <option class="bg-dark text-white" value="Pending" <?= ($status == 'Pending' || $status == '1') ? 'selected' : ''; ?>>Pending</option>
+                                                        <option class="bg-dark text-white" value="Approved" <?= $status == 'Approved' ? 'selected' : ''; ?>>Approved</option>
+                                                        <option class="bg-dark text-white" value="Rejected" <?= $status == 'Rejected' ? 'selected' : ''; ?>>Rejected</option>
+                                                    </select>
+                                                </td>
+                                                <td>
                                                     <form method="post" action="../hapusdatasewa.php" class="m-0">
                                                         <input type="hidden" name="id" value="<?= $formSewa['id']; ?>">
-                                                        <button type="submit" class="btn btn-sm btn-danger" name="delete" onclick="return confirm('Apakah Anda yakin ingin menghapus pesanan ini?');">
+                                                        <input type="hidden" name="delete" value="true">
+                                                        <button type="button" class="btn btn-sm btn-danger btn-delete-sewa">
                                                             <i class="bi bi-trash-fill"></i> Hapus
                                                         </button>
                                                     </form>
@@ -234,5 +251,105 @@ if (!$resultFormSewa) {
 
     <script src="../dist/assets/js/bootstrap.js"></script>
     <script src="../dist/assets/js/app.js"></script>
+    <script src="../dist/assets/extensions/sweetalert2/sweetalert2.min.js"></script>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const statusDropdowns = document.querySelectorAll('.status-dropdown');
+
+            statusDropdowns.forEach(dropdown => {
+                // Simpan status sebelumnya jika user membatalkan pilihan
+                dropdown.addEventListener('focus', function () {
+                    this.setAttribute('data-prev', this.value);
+                });
+
+                dropdown.addEventListener('change', function () {
+                    const idBooking = this.getAttribute('data-id');
+                    const newStatus = this.value;
+                    const prevStatus = this.getAttribute('data-prev') || 'Pending';
+                    const selectEl = this;
+
+                    Swal.fire({
+                        title: 'Ubah Status?',
+                        text: `Anda yakin ingin mengubah status menjadi ${newStatus}?`,
+                        icon: 'question',
+                        showCancelButton: true,
+                        buttonsStyling: false,
+                        customClass: {
+                            confirmButton: 'btn btn-primary me-3',
+                            cancelButton: 'btn btn-secondary'
+                        },
+                        confirmButtonText: 'Ya, Ubah!',
+                        cancelButtonText: 'Batal'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            const formData = new FormData();
+                            formData.append('id_booking', idBooking);
+                            formData.append('new_status', newStatus);
+
+                            fetch('../updatestatusbooking.php', {
+                                method: 'POST',
+                                body: formData
+                            })
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.success) {
+                                    Swal.fire('Berhasil!', 'Status berhasil diubah.', 'success');
+                                    selectEl.setAttribute('data-prev', newStatus);
+
+                                    // Update warna dropdown sesuai pilihan baru
+                                    selectEl.classList.remove('bg-warning', 'bg-success', 'bg-danger', 'text-dark', 'text-white');
+                                    if (newStatus === 'Pending') {
+                                        selectEl.classList.add('bg-warning', 'text-dark');
+                                    } else if (newStatus === 'Approved') {
+                                        selectEl.classList.add('bg-success', 'text-white');
+                                    } else if (newStatus === 'Rejected') {
+                                        selectEl.classList.add('bg-danger', 'text-white');
+                                    }
+                                } else {
+                                    Swal.fire('Gagal!', data.message || 'Gagal mengubah status.', 'error');
+                                    selectEl.value = prevStatus; // Kembalikan ke value awal jika error
+                                }
+                            })
+                            .catch(error => {
+                                console.error('Error:', error);
+                                Swal.fire('Error!', 'Terjadi kesalahan sistem saat menghubungi server.', 'error');
+                                selectEl.value = prevStatus; // Kembalikan ke value awal jika error
+                            });
+                        } else {
+                            selectEl.value = prevStatus; // Kembalikan ke value awal jika dibatalkan
+                        }
+                    });
+                });
+            });
+
+            // SweetAlert untuk tombol hapus pesanan
+            const deleteButtons = document.querySelectorAll('.btn-delete-sewa');
+            deleteButtons.forEach(button => {
+                button.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const form = this.closest('form');
+                    
+                    Swal.fire({
+                        title: 'Hapus Pesanan?',
+                        text: "Apakah Anda yakin ingin menghapus data pesanan ini?",
+                        icon: 'warning',
+                        showCancelButton: true,
+                        buttonsStyling: false,
+                        customClass: {
+                            confirmButton: 'btn btn-danger me-3',
+                            cancelButton: 'btn btn-secondary'
+                        },
+                        confirmButtonText: 'Ya, Hapus!',
+                        cancelButtonText: 'Batal'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            form.submit();
+                        }
+                    });
+                });
+            });
+        });
+    </script>
 </body>
 </html>

@@ -46,15 +46,44 @@ $result = mysqli_query($conn, $sql);
             background-color: #008000;
             color: white;
         }
-        /* Memastikan teks label di modal terlihat jelas */
+        
+        /* --- TWEAK UNTUK MODAL DARK MODE --- */
+        /* Menyesuaikan background modal */
+        .modal-content {
+            background-color: #1e1e2d; /* Warna nyaru dengan card Mazer */
+            color: #d1d1d1;
+            border: none;
+        }
+        /* Menyesuaikan border header & footer modal */
+        .modal-header, .modal-footer {
+            border-color: #2b2b40;
+        }
+        /* Memastikan teks label di modal terlihat terang */
         .modal-body label {
-            color: #333; /* Default modal biasanya background putih */
+            color: #d1d1d1; /* Berubah dari #333 agar terbaca */
             font-weight: bold;
             margin-top: 10px;
         }
+        /* Menyesuaikan kolom input form */
+        .modal-body .form-control {
+            background-color: #151521;
+            border: 1px solid #2b2b40;
+            color: #d1d1d1;
+        }
+        .modal-body .form-control:focus {
+            background-color: #151521;
+            color: #fff;
+            border-color: #435ebe;
+            box-shadow: 0 0 0 0.25rem rgba(67, 94, 190, 0.25);
+        }
+        .close i {
+            color: #d1d1d1; /* X button di modal */
+        }
+        /* ----------------------------------- */
     </style>
 
     <link rel="stylesheet" href="../dist/assets/css/shared/iconly.css">
+    <link rel="stylesheet" href="../dist/assets/extensions/sweetalert2/sweetalert2.min.css">
 </head>
 
 <body>
@@ -163,7 +192,7 @@ $result = mysqli_query($conn, $sql);
                                     <div class="modal-content">
                                         <div class="modal-header">
                                             <h4 class="modal-title" id="myModalLabel33">Tambah Lapangan</h4>
-                                            <button type="button" class="close" data-bs-dismiss="modal" aria-label="Tutup">
+                                            <button type="button" class="close bg-transparent border-0" data-bs-dismiss="modal" aria-label="Tutup">
                                                 <i class="bi bi-x fs-3"></i>
                                             </button>
                                         </div>
@@ -171,18 +200,18 @@ $result = mysqli_query($conn, $sql);
                                             <div class="modal-body">
                                                 <label>Nama Lapangan:</label>
                                                 <div class="form-group">
-                                                    <input type="text" name="nama_lapangan" placeholder="Contoh: Lapangan Matras 1" class="form-control" required>
+                                                    <input type="text" name="nama_lapangan" class="form-control" required>
                                                 </div>
                                                 <label>Harga Sewa (Rp):</label>
                                                 <div class="form-group">
-                                                    <input type="number" name="harga_sewa" placeholder="Contoh: 100000" class="form-control" min="0" required>
+                                                    <input type="number" name="harga_sewa" class="form-control" min="0" required>
                                                 </div>
                                                 <label>Unggah Gambar:</label>
                                                 <div class="form-group mt-2">
                                                     <input type="file" name="gambar" class="form-control" accept="image/*" required>
                                                 </div>
                                             </div>
-                                            <div class="modal-footer">
+                                            <div class="modal-footer border-top-0">
                                                 <button type="button" class="btn btn-light-secondary" data-bs-dismiss="modal">Tutup</button>
                                                 <button type="submit" name="submit" class="btn btn-primary ml-1">Tambahkan</button>
                                             </div>
@@ -193,7 +222,7 @@ $result = mysqli_query($conn, $sql);
 
                             <div class="table-responsive">
                                 <table class="table table-striped table-hover table-bordered mb-0" id="table1" style="width: 100%; white-space: nowrap;">
-                                    <thead class="thead-dark text-center">
+                                    <thead>
                                         <tr>
                                             <th>No</th>
                                             <th>Nama Lapangan</th>
@@ -212,10 +241,10 @@ $result = mysqli_query($conn, $sql);
                                                 <td class="text-start"><?= htmlspecialchars($row['nama_lapangan']); ?></td>
                                                 <td class="fw-bold text-success">Rp <?= number_format($row['harga_sewa'], 0, ',', '.'); ?></td>
                                                 <td>
-                                                    <img src="../<?= $row['gambar']; ?>" class="rounded border shadow-sm" style="width: 100px; height: 60px; object-fit: cover;">
+                                                    <img src="../<?= $row['gambar']; ?>" class="rounded border border-secondary shadow-sm" style="width: 100px; height: 60px; object-fit: cover;">
                                                 </td>
                                                 <td>
-                                                    <a href="../hapuslapangan.php?id=<?= $row['id_lapangan'] ?>" class="btn btn-sm btn-danger" onclick="return confirm('Apakah Anda yakin ingin menghapus lapangan ini?');">
+                                                    <a href="../hapuslapangan.php?id=<?= $row['id_lapangan'] ?>" class="btn btn-sm btn-danger btn-delete-lapangan">
                                                         <i class="bi bi-trash-fill"></i> Hapus
                                                     </a>
                                                 </td>
@@ -233,5 +262,53 @@ $result = mysqli_query($conn, $sql);
     
     <script src="../dist/assets/js/bootstrap.js"></script>
     <script src="../dist/assets/js/app.js"></script>
+    <script src="../dist/assets/extensions/sweetalert2/sweetalert2.min.js"></script>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const deleteButtons = document.querySelectorAll('.btn-delete-lapangan');
+            
+            deleteButtons.forEach(button => {
+                button.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const href = this.getAttribute('href');
+                    
+                    Swal.fire({
+                        title: 'Hapus Lapangan?',
+                        text: "Apakah Anda yakin ingin menghapus data lapangan ini?",
+                        icon: 'warning',
+                        showCancelButton: true,
+                        buttonsStyling: false,
+                        customClass: {
+                            confirmButton: 'btn btn-danger me-3',
+                            cancelButton: 'btn btn-secondary'
+                        },
+                        confirmButtonText: 'Ya, Hapus!',
+                        cancelButtonText: 'Batal'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            window.location.href = href;
+                        }
+                    });
+                });
+            });
+
+            // Notifikasi sukses setelah berhasil dihapus (berdasarkan param URL)
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('status') === 'hapus_sukses') {
+                Swal.fire('Berhasil!', 'Data lapangan telah dihapus.', 'success').then(() => {
+                    window.history.replaceState(null, null, window.location.pathname);
+                });
+            } else if (urlParams.get('status') === 'tambah_sukses') {
+                Swal.fire('Berhasil!', 'Lapangan baru berhasil ditambahkan.', 'success').then(() => {
+                    window.history.replaceState(null, null, window.location.pathname);
+                });
+            } else if (urlParams.get('status') === 'upload_gagal') {
+                Swal.fire('Gagal!', 'Terjadi kesalahan saat mengunggah gambar atau menyimpan data.', 'error').then(() => {
+                    window.history.replaceState(null, null, window.location.pathname);
+                });
+            }
+        });
+    </script>
 </body>
 </html>
