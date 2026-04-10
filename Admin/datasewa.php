@@ -223,9 +223,9 @@ if (!$resultFormSewa) {
                                                     elseif ($status == 'Rejected') $statusClass = 'bg-danger text-white';
                                                     ?>
                                                     <select class="form-select form-select-sm status-dropdown shadow-sm <?= $statusClass; ?>" data-id="<?= $formSewa['id']; ?>">
-                                                        <option class="bg-dark text-white" value="Pending" <?= ($status == 'Pending' || $status == '1') ? 'selected' : ''; ?>>Pending</option>
-                                                        <option class="bg-dark text-white" value="Approved" <?= $status == 'Approved' ? 'selected' : ''; ?>>Approved</option>
-                                                        <option class="bg-dark text-white" value="Rejected" <?= $status == 'Rejected' ? 'selected' : ''; ?>>Rejected</option>
+                                                        <option value="Pending" <?= ($status == 'Pending' || $status == '1') ? 'selected' : ''; ?>>Pending</option>
+                                                        <option value="Approved" <?= $status == 'Approved' ? 'selected' : ''; ?>>Approved</option>
+                                                        <option value="Rejected" <?= $status == 'Rejected' ? 'selected' : ''; ?>>Rejected</option>
                                                     </select>
                                                 </td>
                                                 <td>
