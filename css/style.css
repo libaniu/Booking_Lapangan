@@ -98,11 +98,11 @@ body {
 }
 
 .hero .content p {
-  color: #000000;
+  color: #fff;
   font-size: 1.4rem;
   margin-top: 1rem;
   line-height: 1.4;
-  font-weight: 100;
+  font-weight: 400;
   text-shadow: 1px 1px 3px rgba(1, 1, 3, 0.5);
 }
 
@@ -213,21 +213,35 @@ body {
 /* Tablet */
 @media (max-width: 768px) {
   html {
-    font-size: 62.5%;
+    font-size: 70%; /* Diperbesar agar teks dasar lebih besar */
+  }
+
+  .navbar {
+    padding: 1.5rem 5%; /* Padding dikurangi sedikit agar ruang konten lebih lega */
   }
 
   #hamburger-menu {
     display: inline-block;
   }
 
+  #hamburger-menu svg {
+    width: 32px; /* Ukuran ikon hamburger dibuat lebih besar */
+    height: 32px;
+  }
+
   .navbar .navbar-nav {
     position: absolute;
     top: 100%;
     right: -100%;
-    background-color: #00fa9a;
-    width: 30rem;
+    background-color: #153448; /* Latar belakang biru gelap agar senada dengan navbar */
+    width: 25rem; /* Lebar menu disesuaikan agar proporsional di layar HP */
     height: 100vh;
-    transition: 0.3s;
+    transition: right 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: -5px 0 15px rgba(0, 0, 0, 0.5);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 2rem;
   }
 
   .navbar .navbar-nav.active {
@@ -236,13 +250,13 @@ body {
 
   .navbar .navbar-nav a {
     display: block;
-    margin: 1.5rem;
-    padding: 0.5rem;
-    font-size: 2rem;
+    margin: 1rem 0;
+    padding: 1rem;
+    font-size: 2.5rem; /* Teks menu diperbesar agar lebih mudah di-tap */
   }
 
   .lapangan .row .lapangan-card img {
-    width: 110%;
+    width: 100%; /* Diubah ke 100% agar gambar tidak meluber (overflow) dari layar */
   }
 
   .lokasi .alamat {
@@ -253,7 +267,21 @@ body {
 /* Mobile Phone */
 @media (max-width: 450px) {
   html {
-    font-size: 55%;
+    font-size: 65%; /* Diperbesar lagi agar teks secara keseluruhan lebih jelas di layar HP */
+  }
+
+  .hero .content h1 {
+    font-size: 4rem; /* Ukuran judul utama disesuaikan */
+  }
+
+  .hero .content p {
+    font-size: 1.8rem; /* Teks deskripsi disesuaikan */
+  }
+
+  .hero .content .login,
+  .hero .content .register {
+    font-size: 1.5rem; /* Memperbesar ukuran teks tombol */
+    padding: 0.8rem 1.6rem; /* Memperbesar area tap/padding tombol */
   }
 }
 
@@ -268,7 +296,9 @@ body {
   background-clip: padding-box;
   border: 1px solid #ced4da;
   border-radius: 0.25rem;
-  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+  transition:
+    border-color 0.15s ease-in-out,
+    box-shadow 0.15s ease-in-out;
 }
 
 .form-control:focus {
@@ -488,40 +518,40 @@ body {
 
 /* Membuat blok jadwal yang sudah di-booking memiliki kursor 'dilarang' */
 .jadwal .progress {
-    position: relative; /* Diperlukan agar tooltip baru bisa diposisikan */
-    cursor: not-allowed; 
+  position: relative; /* Diperlukan agar tooltip baru bisa diposisikan */
+  cursor: not-allowed;
 }
 
 /* Menyembunyikan tooltip waktu yang asli saat di-hover */
 .jadwal .progress:hover .progress-tooltip {
-    display: none;
-    opacity: 0;
+  display: none;
+  opacity: 0;
 }
 
 /* Membuat dan menampilkan tooltip "Tidak Tersedia" saat di-hover */
 .jadwal .progress::after {
-    content: 'Tidak Tersedia'; /* Ini adalah teks yang akan muncul */
-    position: absolute;
-    bottom: calc(100% + 5px); /* Posisi 5px di atas bar */
-    left: 50%;
-    transform: translateX(-50%);
+  content: "Tidak Tersedia"; /* Ini adalah teks yang akan muncul */
+  position: absolute;
+  bottom: calc(100% + 5px); /* Posisi 5px di atas bar */
+  left: 50%;
+  transform: translateX(-50%);
 
-    /* Style untuk kotak tooltip */
-    background-color: #c0392b; /* Warna merah gelap agar jelas */
-    color: #fff;
-    padding: 5px 10px;
-    border-radius: 5px;
-    font-size: 0.8rem;
-    white-space: nowrap; /* Mencegah teks terpotong jadi dua baris */
-    z-index: 10;
-    
-    /* Animasi muncul */
-    opacity: 0; /* Sembunyikan secara default */
-    transition: opacity 0.2s ease-in-out;
-    pointer-events: none; /* Penting agar tidak mengganggu interaksi mouse */
+  /* Style untuk kotak tooltip */
+  background-color: #c0392b; /* Warna merah gelap agar jelas */
+  color: #fff;
+  padding: 5px 10px;
+  border-radius: 5px;
+  font-size: 0.8rem;
+  white-space: nowrap; /* Mencegah teks terpotong jadi dua baris */
+  z-index: 10;
+
+  /* Animasi muncul */
+  opacity: 0; /* Sembunyikan secara default */
+  transition: opacity 0.2s ease-in-out;
+  pointer-events: none; /* Penting agar tidak mengganggu interaksi mouse */
 }
 
 /* Menampilkan tooltip "Tidak Tersedia" saat kursor diarahkan ke bar */
 .jadwal .progress:hover::after {
-    opacity: 1;
+  opacity: 1;
 }

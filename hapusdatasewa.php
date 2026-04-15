@@ -18,8 +18,12 @@ if (isset($_POST['delete'])) {
     $resultDelete = mysqli_query($data, $sqlDelete);
 
     if ($resultDelete) {
-        // Redirect back to the page after successful deletion
-        header("Location: admin/datasewa.php"); // Change "index.php" to the page where the table is located
+        // Mengembalikan pengguna ke halaman asal (REFERER)
+        if (isset($_SERVER['HTTP_REFERER'])) {
+            header("Location: " . $_SERVER['HTTP_REFERER']);
+        } else {
+            header("Location: Admin/datasewa.php");
+        }
         exit();
     } else {
         die("Delete error: " . mysqli_error($data));

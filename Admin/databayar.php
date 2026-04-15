@@ -53,6 +53,7 @@ if (!$resultFormSewa) {
     </style>
 
     <link rel="stylesheet" href="../dist/assets/css/shared/iconly.css">
+    <link rel="stylesheet" href="../dist/assets/extensions/sweetalert2/sweetalert2.min.css">
 </head>
 
 <body>
@@ -175,7 +176,8 @@ if (!$resultFormSewa) {
                                                 <td>
                                                     <form method="post" action="../hapusdatasewa.php" class="m-0">
                                                         <input type="hidden" name="id" value="<?= $formSewa['id']; ?>">
-                                                        <button type="submit" class="btn btn-sm btn-danger" name="delete" onclick="return confirm('Apakah Anda yakin ingin menghapus riwayat pembayaran ini?');">
+                                                        <input type="hidden" name="delete" value="true">
+                                                        <button type="button" class="btn btn-sm btn-danger btn-delete-bayar">
                                                             <i class="bi bi-trash-fill"></i> Hapus
                                                         </button>
                                                     </form>
@@ -194,6 +196,36 @@ if (!$resultFormSewa) {
 
     <script src="../dist/assets/js/bootstrap.js"></script>
     <script src="../dist/assets/js/app.js"></script>
-    <script src="../dist/assets/js/pages/dashboard.js"></script>
+    <script src="../dist/assets/extensions/sweetalert2/sweetalert2.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const deleteButtons = document.querySelectorAll('.btn-delete-bayar');
+            
+            deleteButtons.forEach(button => {
+                button.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const form = this.closest('form');
+                    
+                    Swal.fire({
+                        title: 'Hapus Riwayat Pembayaran?',
+                        text: "Apakah Anda yakin ingin menghapus riwayat pembayaran ini?",
+                        icon: 'warning',
+                        showCancelButton: true,
+                        buttonsStyling: false,
+                        customClass: {
+                            confirmButton: 'btn btn-danger me-3',
+                            cancelButton: 'btn btn-secondary'
+                        },
+                        confirmButtonText: 'Ya, Hapus!',
+                        cancelButtonText: 'Batal'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            form.submit();
+                        }
+                    });
+                });
+            });
+        });
+    </script>
 </body>
 </html>

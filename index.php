@@ -166,8 +166,34 @@ $dataJadwal = array_map(function ($lapangan) use ($jdwl) {
         feather.replace()
     </script>
 
-    <script src="js/script.js"></script>
     <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const navbarNav = document.querySelector('.navbar-nav');
+            const hamburger = document.querySelector('#hamburger-menu');
+
+            if (hamburger && navbarNav) {
+                hamburger.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    navbarNav.classList.toggle('active');
+                });
+
+                // Menutup menu saat klik di luar area sidebar
+                document.addEventListener('click', function(e) {
+                    if (!hamburger.contains(e.target) && !navbarNav.contains(e.target)) {
+                        navbarNav.classList.remove('active');
+                    }
+                });
+
+                // Menutup menu saat salah satu tautan diklik
+                const navLinks = document.querySelectorAll('.navbar-nav a');
+                navLinks.forEach(link => {
+                    link.addEventListener('click', () => {
+                        navbarNav.classList.remove('active');
+                    });
+                });
+            }
+        });
+
         window.onload = function() {
 
             const progress_bars = document.getElementsByClassName('progress-bar')
